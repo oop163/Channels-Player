@@ -1,36 +1,165 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Information</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <h3 class="top_text">Information</h3>
-        <br>
-        <br>
-        <br>
-        <br>
-        <div class="main_image">
-            <img src="myimage.png" alt="Photo" class="my_image">
-        </div>
-        <br>
-        <br>
-        <br>
-        <br>
-        <div class="main_box">
-            <div class="box">
-                <h3 class="my_information">My Information : </h3>
-                <h4 class="name">Name : </h4><h5 class="name_end">Test</h5>
-                <br>
-                <h4 class="old">Old : </h4><h5 class="old_end">20</h5>
-                <br>
-                <h4 class="prog">Languages : </h4><h6 class="prog_end">Test, Test, Test, Test</h6>
-                <br>
-                <h4 class="Telegram">Telegram : </h4><a class="Telegram_end" href="https://t.me/rand2m" target="_blank">Click</a>
-            </div>
-        </div>
-    </body>
-</html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مشغل القنوات</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #f4f4f4;
+            --text-light: #333;
+            --bg-dark: #1e1e1e;
+            --text-dark: #f4f4f4;
+            --primary-color: #007bff;
+            --secondary-color: #ff9800;
+            --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            text-align: center;
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--box-shadow);
+            transition: background 0.3s;
+        }
+
+        video {
+            width: 100%;
+            border: 4px solid var(--primary-color);
+            border-radius: 8px;
+            box-shadow: var(--box-shadow);
+            margin-top: 10px;
+        }
+
+        input {
+            width: 80%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 8px var(--secondary-color);
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            background: var(--primary-color);
+            color: white;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: var(--box-shadow);
+        }
+
+        button:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 10px;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary-color);
+        }
+
+        /* الوضع الليلي */
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        body.dark-mode .container {
+            background: #2a2a2a;
+        }
+
+        body.dark-mode input {
+            background-color: #333;
+            color: white;
+            border-color: var(--secondary-color);
+        }
+
+        body.dark-mode video {
+            border-color: var(--secondary-color);
+        }
+
+        body.dark-mode button {
+            background-color: var(--secondary-color);
+        }
+
+        body.dark-mode button:hover {
+            background-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙 الوضع الليلي</button>
+
+    <div class="container">
+        <h2>🎥 مشغل القنوات المباشرة</h2>
+        <input type="text" id="streamURL" placeholder="🔗 أدخل رابط M3U8 هنا">
+        <button onclick="playStream()">▶️ تشغيل</button>
+        <video id="video" controls></video>
+    </div>
+
+    <script>
+        function playStream() {
+            const video = document.getElementById('video');
+            const streamURL = document.getElementById('streamURL').value;
+
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(streamURL);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play();
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = streamURL;
+                video.play();
+            } else {
+                alert("متصفحك لا يدعم تشغيل هذا النوع من الفيديو.");
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle("dark-mode");
+            const themeBtn = document.querySelector(".theme-toggle");
+            if (document.body.classList.contains("dark-mode")) {
+                themeBtn.textContent = "☀️ الوضع النهاري";
+            } else {
+                themeBtn.textContent = "🌙 الوضع الليلي";
+            }
+        }
+    </script>
+</body>
+    </html>
